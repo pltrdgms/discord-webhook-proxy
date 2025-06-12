@@ -3,6 +3,7 @@ import requests
 from http.server import BaseHTTPRequestHandler
 
 def handler(request):
+    print(request)
     try:
         if request.method != "POST":
             return Response(405, {"error": "Only POST allowed"})
