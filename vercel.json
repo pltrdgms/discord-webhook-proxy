@@ -1,10 +1,7 @@
 {
   "version": 2,
   "builds": [
-    {
-      "src": "api/send.py",
-      "use": "@vercel/python"
-    }
+    { "src": "api/send.py", "use": "@vercel/python" }
   ],
   "routes": [
     { "src": "/send", "dest": "api/send.py" }
