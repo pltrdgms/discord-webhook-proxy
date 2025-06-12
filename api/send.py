@@ -2,24 +2,27 @@ import json
 import requests
 
 def handler(request):
-    if request.method != "POST":
-        return {
-            "statusCode": 405,
-            "body": json.dumps({"error": "Only POST allowed"})
-        }
-
     try:
-        body = request.json()
-        url = body.get("url")
-        data = body.get("data")
-
-        if not url or not data:
+        if request.method != "POST":
             return {
-                "statusCode": 400,
-                "body": json.dumps({"error": "Missing fields"})
+                "statusCode": 405,
+                "body": json.dumps({"error": "Only POST allowed"})
             }
 
-        r = requests.post(url, json=data)
+        body = request.body.decode()
+        data = json.loads(body)
+
+        url = data.get("url")
+        payload = data.get("data")
+
+        if not url or not payload:
+            return {
+                "statusCode": 400,
+                "body": json.dumps({"error": "Missing 'url' or 'data'"})
+            }
+
+        r = requests.post(url, json=payload)
+
         return {
             "statusCode": r.status_code,
             "body": r.text
