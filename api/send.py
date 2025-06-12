@@ -2,6 +2,7 @@ import json
 import requests
 
 def handler(request):  # bu fonksiyonun adı bu olmalı
+    print("💥 Fonksiyon tetiklendi!")
     try:
         if request.method != "POST":
             return {
