@@ -22,7 +22,6 @@ def handler(request):
             }
 
         r = requests.post(url, json=payload)
-
         return {
             "statusCode": r.status_code,
             "body": r.text
