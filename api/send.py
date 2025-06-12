@@ -1,6 +1,6 @@
 import json
 import requests
-
+print("💥 Başladı tetiklendi!")
 def handler(request):  # bu fonksiyonun adı bu olmalı
     print("💥 Fonksiyon tetiklendi!")
     try:
