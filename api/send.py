@@ -1,14 +1,11 @@
 import json
 import requests
-print("💥 Başladı tetiklendi!")
-def handler(request):  # bu fonksiyonun adı bu olmalı
-    print("💥 Fonksiyon tetiklendi!")
+from http.server import BaseHTTPRequestHandler
+
+def handler(request):
     try:
         if request.method != "POST":
-            return {
-                "statusCode": 405,
-                "body": json.dumps({"error": "Only POST allowed"})
-            }
+            return Response(405, {"error": "Only POST allowed"})
 
         body = request.body.decode("utf-8")
         data = json.loads(body)
@@ -17,24 +14,20 @@ def handler(request):  # bu fonksiyonun adı bu olmalı
         payload = data.get("data")
 
         if not url or not payload:
-            return {
-                "statusCode": 400,
-                "body": json.dumps({"error": "Missing 'url' or 'data'"})
-            }
+            return Response(400, {"error": "Missing 'url' or 'data'"})
 
         r = requests.post(url, json=payload)
-
-        return {
-            "statusCode": r.status_code,
-            "body": r.text
-        }
-
+        return Response(r.status_code, r.text)
+    
     except Exception as e:
-        return {
-            "statusCode": 500,
-            "body": json.dumps({"error": str(e)})
-        }
+        return Response(500, {"error": str(e)})
 
 
-# ✨ BU ŞART: handler fonksiyonunu export et
+class Response:
+    def __init__(self, status_code, body):
+        self.status_code = status_code
+        self.body = json.dumps(body) if isinstance(body, dict) else body
+        self.headers = {"Content-Type": "application/json"}
+
+
 handler = handler
