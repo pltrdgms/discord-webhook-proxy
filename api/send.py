@@ -9,7 +9,7 @@ def handler(request):
                 "body": json.dumps({"error": "Only POST allowed"})
             }
 
-        body = request.body.decode("utf-8")
+        body = request.body.decode()
         data = json.loads(body)
 
         url = data.get("url")
