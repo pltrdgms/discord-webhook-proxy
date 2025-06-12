@@ -9,7 +9,6 @@ def handler(request):
                 "body": json.dumps({"error": "Only POST allowed"})
             }
 
-        # ✅ Body'i decode et (bytes → string → dict)
         body = request.body.decode("utf-8")
         data = json.loads(body)
 
@@ -22,7 +21,6 @@ def handler(request):
                 "body": json.dumps({"error": "Missing 'url' or 'data'"})
             }
 
-        # ✅ Webhook isteğini gönder
         r = requests.post(url, json=payload)
 
         return {
