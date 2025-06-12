@@ -1,44 +1,31 @@
 import json
 import requests
+from http.server import BaseHTTPRequestHandler
 
-print("🔥 HANDLER YÜKLENDİ")
+class handler(BaseHTTPRequestHandler):
+    def _send(self, status_code, body, content_type="application/json"):
+        self.send_response(status_code)
+        self.send_header("Content-Type", content_type)
+        self.end_headers()
+        self.wfile.write(body.encode() if isinstance(body, str) else body)
 
-def handler(request):
-    print("📥 İstek alındı")
-
-    try:
-        # Vercel’de request.json() önce deneyip, olmazsa body.decode ile yüklüyoruz
+    def do_POST(self):
         try:
-            data = request.json()
-        except:
-            data = json.loads(request.body.decode("utf-8"))
+            # Gönderilen JSON’u oku
+            length = int(self.headers.get("content-length", 0))
+            raw = self.rfile.read(length).decode("utf-8")
+            data = json.loads(raw)
 
-        print("📦 Body:", data)
+            url = data.get("url")
+            payload = data.get("data")
+            if not url or not payload:
+                return self._send(400, json.dumps({"error": "Missing 'url' or 'data'"}))
 
-        url = data.get("url")
-        payload = data.get("data")
+            # Discord’a ilet
+            resp = requests.post(url, json=payload)
 
-        if not url or not payload:
-            print("⚠️ Eksik veri")
-            return {
-                "statusCode": 400,
-                "body": json.dumps({"error": "Missing 'url' or 'data'"})
-            }
+            # Discord cevabını aynen dön
+            return self._send(resp.status_code, resp.text, "text/plain")
 
-        print("🚀 Webhook’a POST:", url)
-        resp = requests.post(url, json=payload)
-        print("✅ Discord’dan dönen kod:", resp.status_code)
-
-        return {
-            "statusCode": resp.status_code,
-            "body": resp.text
-        }
-
-    except Exception as e:
-        print("❌ GENEL HATA:", str(e))
-        return {
-            "statusCode": 500,
-            "body": json.dumps({"error": str(e)})
-        }
-
-handler = handler
+        except Exception as e:
+            return self._send(500, json.dumps({"error": str(e)}))
