@@ -1,12 +1,14 @@
 import json
 import requests
-from http.server import BaseHTTPRequestHandler
 
 def handler(request):
-    print(request)
     try:
         if request.method != "POST":
-            return Response(405, {"error": "Only POST allowed"})
+            return {
+                "statusCode": 405,
+                "body": json.dumps({"error": "Only POST allowed"}),
+                "headers": {"Content-Type": "application/json"}
+            }
 
         body = request.body.decode("utf-8")
         data = json.loads(body)
@@ -15,20 +17,26 @@ def handler(request):
         payload = data.get("data")
 
         if not url or not payload:
-            return Response(400, {"error": "Missing 'url' or 'data'"})
+            return {
+                "statusCode": 400,
+                "body": json.dumps({"error": "Missing 'url' or 'data'"}),
+                "headers": {"Content-Type": "application/json"}
+            }
 
         r = requests.post(url, json=payload)
-        return Response(r.status_code, r.text)
-    
+
+        return {
+            "statusCode": r.status_code,
+            "body": r.text,
+            "headers": {"Content-Type": "application/json"}
+        }
+
     except Exception as e:
-        return Response(500, {"error": str(e)})
+        return {
+            "statusCode": 500,
+            "body": json.dumps({"error": str(e)}),
+            "headers": {"Content-Type": "application/json"}
+        }
 
-
-class Response:
-    def __init__(self, status_code, body):
-        self.status_code = status_code
-        self.body = json.dumps(body) if isinstance(body, dict) else body
-        self.headers = {"Content-Type": "application/json"}
-
-
+# export et
 handler = handler
