@@ -2,7 +2,7 @@ import json
 import requests
 
 def handler(request):
-    print("selam)
+    print("selam")
 
 # export et
 handler = handler
