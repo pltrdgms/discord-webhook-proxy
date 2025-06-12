@@ -1,17 +1,17 @@
 import json
 import requests
 
-print("🔥 HANDLER YÜKLENDİ")  # Deploy sırasında logda görünür
+print("🔥 HANDLER YÜKLENDİ")
 
 def handler(request):
     print("📥 İstek alındı")
 
     try:
+        # Vercel’de request.json() önce deneyip, olmazsa body.decode ile yüklüyoruz
         try:
-            data = request.json()  # en doğru yöntem vercel'de
+            data = request.json()
         except:
-            body = request.body.decode("utf-8")
-            data = json.loads(body)
+            data = json.loads(request.body.decode("utf-8"))
 
         print("📦 Body:", data)
 
@@ -25,17 +25,17 @@ def handler(request):
                 "body": json.dumps({"error": "Missing 'url' or 'data'"})
             }
 
-        print("🚀 Webhook gönderiliyor:", url)
-        response = requests.post(url, json=payload)
-        print("✅ Webhook cevabı:", response.status_code)
+        print("🚀 Webhook’a POST:", url)
+        resp = requests.post(url, json=payload)
+        print("✅ Discord’dan dönen kod:", resp.status_code)
 
         return {
-            "statusCode": response.status_code,
-            "body": response.text
+            "statusCode": resp.status_code,
+            "body": resp.text
         }
 
     except Exception as e:
-        print("❌ HATA:", str(e))
+        print("❌ GENEL HATA:", str(e))
         return {
             "statusCode": 500,
             "body": json.dumps({"error": str(e)})
