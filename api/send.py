@@ -9,19 +9,21 @@ def handler(request):
                 "body": json.dumps({"error": "Only POST allowed"})
             }
 
-        body = request.body.decode()
-        payload = json.loads(body)
+        # ✅ Body'i decode et (bytes → string → dict)
+        body = request.body.decode("utf-8")
+        data = json.loads(body)
 
-        url = payload.get("url")
-        data = payload.get("data")
+        url = data.get("url")
+        payload = data.get("data")
 
-        if not url or not data:
+        if not url or not payload:
             return {
                 "statusCode": 400,
                 "body": json.dumps({"error": "Missing 'url' or 'data'"})
             }
 
-        r = requests.post(url, json=data)
+        # ✅ Webhook isteğini gönder
+        r = requests.post(url, json=payload)
 
         return {
             "statusCode": r.status_code,
