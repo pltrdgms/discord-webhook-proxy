@@ -1,38 +1,40 @@
 import json
 import requests
 
-def handler(request):
-    try:
-        if request.method != "POST":
-            return {
-                "statusCode": 405,
-                "body": json.dumps({"error": "Only POST allowed"})
-            }
+print("🔥 HANDLER ÇALIŞTI")  # Bu satır logda görünüyorsa çalışıyor
 
+def handler(request):
+    print("📥 İstek alındı")
+
+    try:
         body = request.body.decode("utf-8")
         data = json.loads(body)
+        print("🔎 Body:", data)
 
         url = data.get("url")
         payload = data.get("data")
 
         if not url or not payload:
+            print("⚠️ Eksik veri")
             return {
                 "statusCode": 400,
                 "body": json.dumps({"error": "Missing 'url' or 'data'"})
             }
 
-        r = requests.post(url, json=payload)
+        print("📤 Webhook gönderiliyor:", url)
+        response = requests.post(url, json=payload)
+        print("✅ Webhook cevabı:", response.status_code)
 
         return {
-            "statusCode": r.status_code,
-            "body": r.text
+            "statusCode": response.status_code,
+            "body": response.text
         }
 
     except Exception as e:
+        print("💥 HATA:", str(e))
         return {
             "statusCode": 500,
             "body": json.dumps({"error": str(e)})
         }
 
-# Şart: Vercel bunu export ediyor
 handler = handler
